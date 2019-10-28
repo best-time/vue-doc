@@ -1,6 +1,13 @@
 // 位运算: https://www.cnblogs.com/ckAng/p/9996699.html
 // https://www.jianshu.com/p/cc7018492c0f
 
+
+/**
+ 旧 VNode	新 VNode	操作
+❌	✅	调用 mount 函数
+✅	❌	移除 DOM
+✅	✅	调用 patch 函数
+ */
 function render(vnode, container) {
   const prevVNode = container.vnode;
   if (prevVNode == null) {
@@ -253,6 +260,43 @@ function patchElement(prevVNode, nextVNode, container) {
     nextVNode.children, // 新的 VNode 子节点
     el // 当前标签元素，即这些子节点的父节点
   );
+}
+
+function patchData(el, key, prevValue, nextValue) {
+  switch (key) {
+    case 'style':
+      for (let k in nextValue) {
+        el.style[k] = nextValue[k]
+      }
+      for (let k in prevValue) {
+        if (!nextValue.hasOwnProperty(k)) {
+          el.style[k] = ''
+        }
+      }
+      break
+    case 'class':
+      el.className = nextValue
+      break
+    default:
+      if (key[0] === 'o' && key[1] === 'n') {
+        // 事件
+        // 移除旧事件
+        if (prevValue) {
+          el.removeEventListener(key.slice(2), prevValue)
+        }
+        // 添加新事件
+        if (nextValue) {
+          el.addEventListener(key.slice(2), nextValue)
+        }
+      } else if (domPropsRE.test(key)) {
+        // 当作 DOM Prop 处理
+        el[key] = nextValue
+      } else {
+        // 当作 Attr 处理
+        el.setAttribute(key, nextValue)
+      }
+      break
+  }
 }
 
 function patchChildren(

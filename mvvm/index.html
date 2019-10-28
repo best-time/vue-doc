@@ -1,44 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
+
 <body>
 
-        
+
     <div id="app">
-            <input type="text" v-model="message.a" />
-            <i>{{message.b}} {{b}}</i>
+        <input type="text" v-model="message.a" />
+        <i>{{message.b}} {{b}}</i>
         <p>computed: {{hello}}</p>
     </div>
     <!-- <div id="app"><p>{{b}}</p></div> -->
-    <script src="js/observer.js"></script>
-    <script src="js/watcher.js"></script>
-    <script src="js/compile.js"></script>
-    <script src="js/mvvm.js"></script>
-    <script>
-        let vm = new MVVM({
-            el: '#app',
-            data: {
-                message: {
-                    a: "hello",
-                    b: "message-b"
-                },
-                b: " this is b ",
-                c: " and c "
-            },
-            computed: {
-                hello() {
-                    return this.b + this.c + this.message.a
-                }
-            }
-        })
 
-        /*
-        // 旧的 VNode
+    <pre style="background-color: #eee;">
+// 旧的 VNode
 const prevVNode = h('div', null, [
   h('p', { key: 'a' }, '节点1'),
   h('p', { key: 'b' }, '节点2'),
@@ -51,15 +32,19 @@ const nextVNode = h('div', null, [
   h('p', { key: 'a' }, '节点1'),
   h('p', { key: 'b' }, '节点2')
 ])
+    </pre>
 
-render(prevVNode, document.getElementById('app'))
+    <div id="box">
+    </div>
 
-// 2秒后更新
-setTimeout(() => {
-  render(nextVNode, document.getElementById('app'))
-}, 2000)
-
-        */
-    </script>
+    <script src="js/const.js"></script>
+    <script src="js/h.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/observer.js"></script>
+    <script src="js/watcher.js"></script>
+    <script src="js/compile.js"></script>
+    <script src="js/mvvm.js"></script>
+    <script src="index.js"></script>
 </body>
+
 </html>
