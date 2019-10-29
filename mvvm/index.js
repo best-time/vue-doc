@@ -40,5 +40,15 @@ render(nextVNode, document.getElementById('app'))
 */
 
 let $box = document.getElementById("box");
-let vdiv = h("div", { style: { width: "100px", height: "100px", backgroundColor: 'red' } });
+let vdiv = h(
+  "div",
+  { style: { width: "100px", height: "100px", backgroundColor: "red" }, class: 'cls-a cls-b' },
+  h("div", {
+    style: {
+      height: "50px",
+      width: "50px",
+      background: "green"
+    }
+  })
+);
 render(vdiv, $box);

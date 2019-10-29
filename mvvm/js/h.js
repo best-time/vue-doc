@@ -5,6 +5,9 @@ function h(tag, data = null, children = null) {
   let flags = null;
   if (typeof tag === "string") {
     flags = tag === "svg" ? VNodeFlags.ELEMENT_SVG : VNodeFlags.ELEMENT_HTML;
+    if(data) {
+      data.class = normalizeClass(data.class)
+    }
   } else if (tag === Fragment) {
     flags = VNodeFlags.FRAGMENT;
   } else if (tag === Portal) {
@@ -68,6 +71,22 @@ function normalizeVNodes(children) {
     newChildren.push(child);
   }
   return newChildren;
+}
+
+function normalizeClass(classValue) {
+  let res = ''
+  if(typeof classValue === 'string') {
+    res = classValue
+  } else if (Array.isArray(classValue)) {
+    for(let i=0; i < classValue.length; i++) {
+      res += classValue[i]
+    }
+  } else if (typeof classValue === 'object') {
+    for(let key in classValue) {
+      classValue[key] && (res += name +' ')
+    }
+  }
+  return res.trim()
 }
 
 // 文本节点
