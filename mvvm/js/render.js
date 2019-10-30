@@ -1,6 +1,3 @@
-// 位运算: https://www.cnblogs.com/ckAng/p/9996699.html
-// https://www.jianshu.com/p/cc7018492c0f
-
 
 /**
  旧 VNode	新 VNode	操作
@@ -8,6 +5,8 @@
 ✅	❌	移除 DOM
 ✅	✅	调用 patch 函数
  */
+
+ // mount patch
 function render(vnode, container) {
   const prevVNode = container.vnode;
   if (prevVNode == null) {
@@ -261,6 +260,53 @@ function patchElement(prevVNode, nextVNode, container) {
     el // 当前标签元素，即这些子节点的父节点
   );
 }
+
+function patchData(el, key, prevValue, nextValue) {
+  switch (key) {
+    case 'style':
+      for (let k in nextValue) {
+        el.style[k] = nextValue[k]
+      }
+      for (let k in prevValue) {
+        if (!nextValue.hasOwnProperty(k)) {
+          el.style[k] = ''
+        }
+      }
+      break
+    case 'class':
+      el.className = nextValue
+      break
+    default:
+      if (key.startsWith('on')) {
+        // 事件
+        // 移除旧事件
+        if (prevValue) {
+          el.removeEventListener(key.slice(2), prevValue)
+        }
+        // 添加新事件
+        if (nextValue) {
+          el.addEventListener(key.slice(2), nextValue)
+        }
+      } else if (domPropsRE.test(key)) {
+        // 当作 DOM Prop 处理
+        el[key] = nextValue
+      } else {
+        // setAttribute 函数为元素设置属性时，无论你传递的值是什么类型，它都会将该值转为字符串再设置到元素上
+        // 当作 Attr 处理
+        el.setAttribute(key, nextValue)
+      }
+      break
+  }
+}
+
+/*
+一些特殊的 attribute，比如 checked/disabled 等，只要出现了，对应的 property 就会被初始化为 true，
+无论设置的值是什么,只有调用 removeAttribute 删除这个 attribute，对应的 property 才会变成 false。
+
+这就指引我们有些属性不能通过 setAttribute 设置，而是应该直接通过 DOM 元素设置：el.checked = true。
+好在这样的属性不多，我们可以列举出来：value、checked、selected、muted。
+除此之外还有一些属性也需要使用 Property 的方式设置到 DOM 元素上，例如 innerHTML 和 textContent 等等。
+*/
 
 function patchChildren(
   prevChildFlags,
