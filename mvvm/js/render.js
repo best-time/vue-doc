@@ -127,7 +127,8 @@ function mountPortal(vnode, container) {
 
 function mountComponent(vnode, container, isSVG) {
   if (vnode.flags & VNodeFlags.COMPONENT_STATEFUL) {
-    mountStatefulComponent(vnode, container, isSVG);
+    
+    (vnode, container, isSVG);
   } else {
     mountFunctionalComponent(vnode, container, isSVG);
   }
