@@ -19,7 +19,7 @@ class Watcher {
     Dep.target = this;
     let value = this.getVal(this.vm, this.expr);
     Dep.target = null;
-    return value
+    return value;
   }
 
   update() {

@@ -37,7 +37,6 @@ export interface VNode {
   _isVNode: true
   // 当一个 VNode 被渲染为真实 DOM 之后，el 属性的值会引用该真实DOM
   el: Element | null
-  
   flags: VNodeFlags
   tag: string | FunctionalComponent | ComponentClass | null
   data: VNodeData | null
