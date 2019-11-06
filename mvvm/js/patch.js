@@ -34,6 +34,7 @@ function patchElement(prevVNode, nextVNode, container) {
     return;
   }
 
+  // nextVNode.el 也引用该元素
   const el = (nextVNode.el = prevVNode.el);
   const prevData = prevVNode.data;
   const nextData = nextVNode.data;
@@ -167,34 +168,36 @@ function patchChildren(
         let oldEndVNode = prevChildren[oldEndIdx];
         let newStartVNode = nextChildren[newStartIdx];
         let newEndVNode = nextChildren[newEndIdx];
-      }
 
-      while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
-        if (oldStartVNode.key === newStartVNode.key) {
-          // 新/老start
-          patch(oldStartVNode, newStartVNode, container);
-          oldStartVNode = prevChildren[++oldStartIdx];
-          newStartVNode = nextChildren[++newStartIdx];
-        } else if (oldEndVNode.key === newEndVNode.key) {
-          // 新/老end节点
-          patch(oldEndVNode, newEndVNode, container);
-          oldEndVNode = prevChildren[--oldEndIdx];
-          newEndVNode = newEndVNode[--newEndIdx];
-        } else if (oldStartVNode.key === newEndVNode.key) {
-          // 老start 新end
-          patch(oldStartVNode, newEndVNode, container);
-          container.insertBefore(oldStartVNode.el, oldEndVNode.el.nextSibling);
-          oldStartVNode = prevChildren[++oldStartIdx];
-          newEndVNode = nextChildren[--newEndIdx];
-        } else if (oldEndVNode.key === newStartVNode.key) {
-          // 老end 新start
-          patch(oldEndVNode, newStartVNode, container);
-          container.insertBefore(oldEndVNode.el, oldStartVNode.el);
-          oldEndVNode = prevChildren[--oldEndIdx];
-          newStartVNode = nextChildren[++newStartIdx];
+        while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
+          if (oldStartVNode.key === newStartVNode.key) {
+            // 新/老start
+            patch(oldStartVNode, newStartVNode, container);
+            oldStartVNode = prevChildren[++oldStartIdx];
+            newStartVNode = nextChildren[++newStartIdx];
+          } else if (oldEndVNode.key === newEndVNode.key) {
+            // 新/老end节点
+            patch(oldEndVNode, newEndVNode, container);
+            oldEndVNode = prevChildren[--oldEndIdx];
+            newEndVNode = newEndVNode[--newEndIdx];
+          } else if (oldStartVNode.key === newEndVNode.key) {
+            // 老start 新end
+            patch(oldStartVNode, newEndVNode, container);
+            container.insertBefore(
+              oldStartVNode.el,
+              oldEndVNode.el.nextSibling
+            );
+            oldStartVNode = prevChildren[++oldStartIdx];
+            newEndVNode = nextChildren[--newEndIdx];
+          } else if (oldEndVNode.key === newStartVNode.key) {
+            // 老end 新start
+            patch(oldEndVNode, newStartVNode, container);
+            container.insertBefore(oldEndVNode.el, oldStartVNode.el);
+            oldEndVNode = prevChildren[--oldEndIdx];
+            newStartVNode = nextChildren[++newStartIdx];
+          }
         }
       }
-      break;
   }
 }
 
