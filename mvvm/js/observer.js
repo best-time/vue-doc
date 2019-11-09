@@ -22,11 +22,11 @@ class Observer {
         Dep.target && dep.addSub(Dep.target);
         return value;
       },
-      set: (newVal) => {
+      set: newVal => {
         if (newVal !== value) {
           this.observe(newVal);
           value = newVal;
-          dep.notify()
+          dep.notify();
         }
       }
     });

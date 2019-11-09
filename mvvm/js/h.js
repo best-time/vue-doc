@@ -5,8 +5,8 @@ function h(tag, data = null, children = null) {
   let flags = null;
   if (typeof tag === "string") {
     flags = tag === "svg" ? VNodeFlags.ELEMENT_SVG : VNodeFlags.ELEMENT_HTML;
-    if(data) {
-      data.class = normalizeClass(data.class)
+    if (data) {
+      data.class = normalizeClass(data.class);
     }
   } else if (tag === Fragment) {
     flags = VNodeFlags.FRAGMENT;
@@ -53,6 +53,7 @@ function h(tag, data = null, children = null) {
     tag,
     flags,
     data,
+    key: data && data.key ? data.key : null,
     children,
     childFlags,
     el: null,
@@ -74,19 +75,19 @@ function normalizeVNodes(children) {
 }
 
 function normalizeClass(classValue) {
-  let res = ''
-  if(typeof classValue === 'string') {
-    res = classValue
+  let res = "";
+  if (typeof classValue === "string") {
+    res = classValue;
   } else if (Array.isArray(classValue)) {
-    for(let i=0; i < classValue.length; i++) {
-      res += classValue[i]
+    for (let i = 0; i < classValue.length; i++) {
+      res += classValue[i];
     }
-  } else if (typeof classValue === 'object') {
-    for(let key in classValue) {
-      classValue[key] && (res += name +' ')
+  } else if (typeof classValue === "object") {
+    for (let key in classValue) {
+      classValue[key] && (res += name + " ");
     }
   }
-  return res.trim()
+  return res.trim();
 }
 
 // 文本节点
