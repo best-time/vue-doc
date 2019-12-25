@@ -1,6 +1,6 @@
 ## 字符串借用数组方法
 
-```
+```javascript
 var a = "foo"
 var c = a
 var d = a
@@ -15,7 +15,7 @@ d; // "F.O.O."
 
 ## 数字表示方式
 
-```
+```javascript
 1E3  // 1 * 10^3
 
 是否是整数
@@ -71,7 +71,7 @@ es6 提供了 Object.is(0, -0)
 
 ## void
 
-```
+```javascript
 return void setTimeout( doSomething,100 );
 
 等于
@@ -81,7 +81,7 @@ return;
 ```
 
 ## Date
-```
+```javascript
 
 
 if (!Date.now) {
@@ -92,14 +92,14 @@ if (!Date.now) {
 ```
 
 ## ~
-```
+```javascript
 ~x 大致等同于 -(x+1)
 对于  indexOf 为-1的时候 可以使用
 ```
 
 ## ~~
 
-```
+```javascript
 取整
 ~~2.1   // 2
 ~~2.9  // 2
@@ -108,7 +108,7 @@ if (!Date.now) {
 ```
 
 ## json.stringify
-```
+```javascript
 JSON.stringify( a, 
 	function(key,val){ 
 	if (typeof val == "function") {
@@ -220,7 +220,7 @@ s2 + ""; // TypeError
 ```
 
 ## ==  和 ===
-```
+```javascript
 有人觉得 == 会比 === 慢，实际上虽然强制类型转换确实要多花点时间，
 但仅仅是微秒级 (百万分之一秒)的差别而已。
 
@@ -259,7 +259,7 @@ a == b; // true
 
 
 ## try .. finally
-```
+```javascript
 function foo() {
              try {
 	return 42;
@@ -323,6 +323,85 @@ baz();  // Hello
 ```
 
 
+
+## 迭代器
+
+```javascript
+// 多个迭代器
+function *foo() {
+    var x = yield 2;
+    z++;
+    var y = yield (x * z);
+    console.log( x, y, z );
+}
+
+var z = 1;
+var it1 = foo();
+var it2 = foo();
+
+var val1 = it1.next().value; // 2 <-- yield 2
+var val2 = it2.next().value; // 2 <-- yield 2
+
+val1 = it1.next( val2 * 10 ).value; // 40 <-- x:20, z:2
+val2 = it2.next( val1 * 5 ).value; // 600 <-- x:200, z:3
+
+it1.next( val2 / 2 ); // y:300
+// 20 300 3
+it2.next( val1 / 4 ); // y:10
+// 200 10 3
+
+流程分析:
+(1) *foo() 的两个实例同时启动，两个 next() 分别从 yield 2 语句得到值 2 。
+(2) val2 * 10 也就是 2 * 10 ，发送到第一个生成器实例 it1 ，因此 x 得到值 20 。 z 从 1 增
+加到 2 ，然后 20 * 2 通过 yield 发出，将 val1 设置为 40 。
+(3) val1 * 5 也就是 40 * 5 ，发送到第二个生成器实例 it2 ，因此 x 得到值 200 。 z 再次从 2
+递增到 3 ，然后 200 * 3 通过 yield 发出，将 val2 设置为 600 。
+(4) val2 / 2 也就是 600 / 2 ，发送到第一个生成器实例 it1 ，因此 y 得到值 300 ，然后打印
+出 x y z 的值分别是 20 300 3 。
+(5) val1 / 4 也就是 40 / 4 ，发送到第二个生成器实例 it2 ，因此 y 得到值 10 ，然后打印出
+x y z 的值分别为 200 10 3 。
+
+
+
+demo2 
+function *foo() {
+    var x = yield 2;
+	console.log(x, 'xxx')
+    z++;
+    var y = yield (x * z);
+    console.log( x, y, z );
+}
+
+var z = 1;
+var aa = foo()
+
+执行1
+aa.next() // {value: 2, done: false}
+aa.next(9) // 9 "xxx"  {value: 18, done: false}
+aa.next(99) // 9 99 2 {value: undefined, done: true}
+
+执行2
+aa.next() // {value: 2, done: false}
+aa.next() // undefined "xxx"  {value: NaN, done: false}
+aa.next() // undefined undefined 2  {value: undefined, done: true}
+
+
+
+从 ES6 开始，从一个 iterable 中提取迭代器的方法是：
+iterable 必须支持一个函数，其名称
+是专门的 ES6 符号值 Symbol.iterator 。调用这个函数时，
+它会返回一个迭代器。通常每
+次调用会返回一个全新的迭代器，虽然这一点并不是必须的
+var a = [1,3,5,7,9];
+var it = a[Symbol.iterator]();
+it.next().value; // 1
+it.next().value; // 3
+it.next().value; // 5
+
+
+
+
+```
 
 
 
