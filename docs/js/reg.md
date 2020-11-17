@@ -1,4 +1,5 @@
-## 字面量方式、实例创建的方式
+## 正则
+字面量方式、实例创建的方式
 ```
 //->实例创建第一参数值是字符串
 //->想要和字面量方式保持统一的话,对于\d \w \n...这些都需要多加一个\,
@@ -84,12 +85,12 @@ x|y -> x或者y的一个
 ```
 (?=p)，其中p是一个子模式，即p前面的位置。比如(?=l)，表示'l'字符前面的位置，例如：
 var result = "hello".replace(/(?=l)/g, '#');
-console.log(result); 
+console.log(result);
 // => "he#l#lo"
 
 而(?!p)就是(?=p)的反面意思，比如：
 var result = "hello".replace(/(?!l)/g, '#');
-console.log(result); 
+console.log(result);
 // => "#h#ell#o#"
 
 ```
@@ -100,7 +101,7 @@ console.log(result);
 ```
 var regex = /(\d{4})-(\d{2})-(\d{2})/;
 var string = "2017-06-12";
-console.log( string.match(regex) ); 
+console.log( string.match(regex) );
 // => ["2017-06-12", "2017", "06", "12", index: 0, input: "2017-06-12"]
 
 match返回的一个数组，第一个元素是整体匹配结果，然后是各个分组（括号里）匹配的内容，然后是匹配下标，最后是输入的文本。（注意：如果正则是否有修饰符g，match返回的数组格式是不一样的）
@@ -108,7 +109,7 @@ match返回的一个数组，第一个元素是整体匹配结果，然后是各
 exec
 var regex = /(\d{4})-(\d{2})-(\d{2})/;
 var string = "2017-06-12";
-console.log( regex.exec(string) ); 
+console.log( regex.exec(string) );
 // => ["2017-06-12", "2017", "06", "12", index: 0, input: "2017-06-12"]
 
 $1 - $9
@@ -128,7 +129,7 @@ console.log(RegExp.$3); // "12"
 var regex = /(\d{4})-(\d{2})-(\d{2})/;
 var string = "2017-06-12";
 var result = string.replace(regex, "$2/$3/$1");
-console.log(result); 
+console.log(result);
 // => "06/12/2017"
 
 等价于
@@ -137,7 +138,7 @@ var string = "2017-06-12";
 var result = string.replace(regex, function() {
 	return RegExp.$2 + "/" + RegExp.$3 + "/" + RegExp.$1;
 });
-console.log(result); 
+console.log(result);
 // => "06/12/2017"
 
 也等价于
@@ -146,7 +147,7 @@ var string = "2017-06-12";
 var result = string.replace(regex, function(match, year, month, day) {
 	return month + "/" + day + "/" + year;
 });
-console.log(result); 
+console.log(result);
 // => "06/12/2017"
 
 反向引用 ⭐️
@@ -186,7 +187,7 @@ console.log( RegExp.$4 ); // 3
 
 因为反向引用，是引用前面的分组，但我们在正则里引用了不存在的分组时，此时正则不会报错，只是匹配反向引用的字符本身。例如\2，就匹配"\2"。注意"\2"表示对"2"进行了转意。
 var regex = /\1\2\3\4\5\6\7\8\9/;
-console.log( regex.test("\1\2\3\4\5\6\7\8\9") ); 
+console.log( regex.test("\1\2\3\4\5\6\7\8\9") );
 console.log( "\1\2\3\4\5\6\7\8\9".split("") );
 
 
@@ -237,7 +238,7 @@ console.log( string.match(regex) );
 金额添加符号,
 var reg = /(?!^)(?=(\d{3})+$)/g;
 var result = "12345678".replace(reg, ',')
-console.log(result); 
+console.log(result);
 // => "12,345,678"
 
 trim 两种实现
@@ -246,14 +247,14 @@ trim 两种实现
 function trim(str) {
 	return str.replace(/^\s+|\s+$/g, '');
 }
-console.log( trim("  foobar   ") ); 
+console.log( trim("  foobar   ") );
 // => "foobar"
 
 第二种，匹配整个字符串，然后用引用来提取出相应的数据
 function trim(str) {
 	return str.replace(/^\s*(.*?)\s*$/g, "$1");
 }
-console.log( trim("  foobar   ") ); 
+console.log( trim("  foobar   ") );
 // => "foobar"
 
 
@@ -264,7 +265,7 @@ function titleize(str) {
 		return c.toUpperCase();
 	});
 }
-console.log( titleize('my name is epeli') ); 
+console.log( titleize('my name is epeli') );
 // => "My Name Is Epeli"
 
 
@@ -275,7 +276,7 @@ function camelize(str) {
 		return c ? c.toUpperCase() : '';
 	});
 }
-console.log( camelize('-moz-transform') ); 
+console.log( camelize('-moz-transform') );
 // => "MozTransform"
 
 中划线化
@@ -283,7 +284,7 @@ console.log( camelize('-moz-transform') );
 function dasherize(str) {
 	return str.replace(/([A-Z])/g, '-$1').replace(/[-_\s]+/g, '-').toLowerCase();
 }
-console.log( dasherize('MozTransform') ); 
+console.log( dasherize('MozTransform') );
 // => "-moz-transform"
 
 
@@ -378,7 +379,7 @@ replace有两种使用形式，这是因为它的第二个参数，可以是字�
 
 $1,$2,...,$99 匹配第1~99个分组里捕获的文本
 $& 匹配到的子串文本
-$` 匹配到的子串的左边文本 
+$` 匹配到的子串的左边文本
 $' 匹配到的子串的右边文本
 $$ 美元符号
 

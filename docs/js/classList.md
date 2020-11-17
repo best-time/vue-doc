@@ -1,3 +1,4 @@
+## classList
 ## Element.classList
 
 是一个只读属性，返回一个元素的类属性的实时 [`DOMTokenList`](https://developer.mozilla.org/zh-CN/docs/Web/API/DOMTokenList) 集合。
@@ -56,7 +57,7 @@ div.classList.remove("foo", "bar", "baz");
 
 // 使用展开语法添加或移除多个类值
 const cls = ["foo", "bar"];
-div.classList.add(...cls); 
+div.classList.add(...cls);
 div.classList.remove(...cls);
 
 // 将类值 "foo" 替换成 "bar"

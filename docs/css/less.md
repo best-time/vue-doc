@@ -1,3 +1,5 @@
+# less
+
 ## imports
 ```
 The following import directives have been implemented:
@@ -57,7 +59,7 @@ content: "I am fnord.";
 ```
 .a {
 	&-b {
-	
+
 	}
 }
 ```
@@ -120,7 +122,7 @@ content: "I am fnord.";
   margin: 0 auto;
 }
 
-=> 
+=>
 
 .banner {
   font-weight: bold;
@@ -166,7 +168,7 @@ nav ul {
   color: red;
 }
 
-=> 
+=>
 
 nav ul {
   background: blue;
@@ -226,7 +228,7 @@ pre:hover:extend(div pre),
 }
 .some-class:extend(.bucket tr) {} // nested ruleset is recognized
 
-=> 
+=>
 
 .bucket tr,
 .some-class {
@@ -268,7 +270,7 @@ extend "all"  ---------------------------------------------
 
 .replacement:extend(.test all) {}
 
-=> 
+=>
 
 .a.b.test,
 .test.c,
@@ -290,7 +292,7 @@ extend "all"  ---------------------------------------------
   background-color: black;
   color: white;
 }
-and you want to have a subtype of animal which overrides the background 
+and you want to have a subtype of animal which overrides the background
 color then you have two options, firstly change your HTML
 
 <a class="animal bear">Bear</a>
@@ -462,7 +464,7 @@ button.list-style {
   .box-shadow(2px; 5px);
 }
 
-=> 
+=>
 
 .big-block {
   -webkit-box-shadow: 2px 5px 1px #000;
