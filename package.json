@@ -3,10 +3,13 @@
     "main": "index.js",
     "author": "y",
     "scripts": {
-      "docs:dev": "vuepress dev docs",
-      "docs:build": "vuepress build docs"
+        "docs:dev": "vuepress dev docs",
+        "docs:build": "vuepress build docs"
     },
     "devDependencies": {
+        "@vuepress/plugin-back-to-top": "^1.7.1",
+        "@vuepress/plugin-last-updated": "^1.7.1",
+        "@vuepress/plugin-nprogress": "^1.7.1",
         "vuepress": "^0.8.4"
-      }
-  }
+    }
+}
