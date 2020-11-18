@@ -1,7 +1,7 @@
 # less
 
 ## imports
-```
+```css
 The following import directives have been implemented:
 
 reference: use a Less file but do not output it
@@ -17,7 +17,7 @@ Example: @import (optional, reference) "foo.less";
 ```
 
 ## 变量
-```
+```css
 Variables are lazy loaded and do not have to be declared before being used.
 
 
@@ -42,7 +42,7 @@ content: "I am fnord.";
 
 ## mixins
 
-```
+```css
 .bordered {
   border-top: dotted 1px black;
   border-bottom: solid 2px black;
@@ -56,7 +56,7 @@ content: "I am fnord.";
 
 ## nested rules
 
-```
+```css
 .a {
 	&-b {
 
@@ -65,7 +65,7 @@ content: "I am fnord.";
 ```
 
 ## functions
-```
+```scss
 @base: #f04615;
 @width: 0.5;
 
@@ -82,7 +82,7 @@ content: "I am fnord.";
 
 ## scope
 
-```
+```scss
 @var: red;
 
 #page {
@@ -104,14 +104,14 @@ content: "I am fnord.";
 
 ## 导入
 
-```
+```scss
 @import "library"; // library.less
 @import "typo.css";
 ```
 
 ## 变量作为属性
 
-```
+```scss
 // Variables
 @my-selector: banner;
 
@@ -159,7 +159,7 @@ body {
 ```
 
 ## extend
-```
+```scss
 nav ul {
   &:extend(.inline);
   background: blue;
@@ -181,7 +181,7 @@ nav ul {
 ```
 
 ## Extend Syntax
-```
+```scss
 
 .a:extend(.b) {}
 
@@ -287,7 +287,7 @@ extend "all"  ---------------------------------------------
 ```
 
 ## use cases for Extend
-```
+```scss
 .animal {
   background-color: black;
   color: white;
@@ -323,7 +323,7 @@ or have simplified html and use extend in your less. e.g.
 
 Example - with mixin:
 
-```
+```scss
 
 .my-inline-block() {
     display: inline-block;
@@ -339,7 +339,7 @@ Example - with mixin:
 
 Outputs
 
-```
+```scss
 
 .thing1 {
   display: inline-block;
@@ -352,7 +352,7 @@ Outputs
 ```
 Example (with extends):
 
-```
+```scss
 
 .my-inline-block {
   display: inline-block;
@@ -367,7 +367,7 @@ Example (with extends):
 ```
 Outputs
 
-```
+```scss
 
 .my-inline-block,
 .thing1,
@@ -377,7 +377,7 @@ Outputs
 }
 ```
 
-```
+```scss
 li.list > a {
   // list styles
 }
@@ -387,7 +387,7 @@ button.list-style {
 ```
 
 ## namspace
-```
+```scss
 #outer {
   .inner {
     color: red;
@@ -428,7 +428,7 @@ button.list-style {
 
 
 ## !important
-```
+```scss
 .foo (@bg: #f5f5f5, @color: #900) {
   background: @bg;
   color: @color;
@@ -453,7 +453,7 @@ button.list-style {
 ```
 
 ## arguments
-```
+```scss
 
 .box-shadow(@x: 0; @y: 0; @blur: 1px; @color: #000) {
   -webkit-box-shadow: @arguments;
@@ -476,7 +476,7 @@ button.list-style {
 
 ## LOOPS
 
-```
+```scss
 .generate-columns(4);
 
 .generate-columns(@n, @i: 1) when (@i =< @n) {
@@ -504,7 +504,7 @@ button.list-style {
 ```
 
 ## Merge
-```
+```scss
 merge is useful for properties such as background and transform.
 
 .mixin() {
@@ -539,4 +539,5 @@ merge is useful for properties such as background and transform.
 ```
 
 [less文档](https://www.w3cschool.cn/less/nested_directives_bubbling.html)
+
 [less文档2](https://www.yiibai.com/less/less_installation.html)
