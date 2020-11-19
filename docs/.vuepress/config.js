@@ -41,14 +41,16 @@ module.exports = {
             'operation',
             'reg',
             'screen',
+            'dom',
+            'dom位置'
           ],
         },
         {
           title: 'es6',
           children: [
             // '/',
-            'Proxy',
-            'Reflect',
+            {title: 'Proxy', path: '/js/es6/Proxy'},
+            {title: 'Reflect', path: '/js/es6/Reflect'},
             {title: 'typescript', path: '/js/es6/typescript'},
           ],
         },
