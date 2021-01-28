@@ -21,6 +21,7 @@ module.exports = {
     nav: [
       {text: 'js', link: '/js/'},
       {text: 'css', link: '/css/'},
+      {text: 'others', link: '/others/'},
       {text: 'git', link: '/git/'},
       {text: '关于', link: '/about/'},
     ],
@@ -42,7 +43,8 @@ module.exports = {
             'reg',
             'screen',
             'dom',
-            'dom位置'
+            'dom位置',
+            'function'
           ],
         },
         {
@@ -61,6 +63,15 @@ module.exports = {
           children: [
             // '/',
             'less',
+          ],
+        },
+      ],
+      '/others/': [
+        {
+          title: '其他',
+          children: [
+            // '/',
+            'jsbridge',
           ],
         },
       ],
