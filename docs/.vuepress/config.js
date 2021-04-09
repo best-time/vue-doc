@@ -20,6 +20,7 @@ module.exports = {
     sidebarDepth: 2,
     nav: [
       {text: 'js', link: '/js/'},
+      {text: 'html', link: '/html/'},
       {text: 'css', link: '/css/'},
       {text: 'others', link: '/others/'},
       {text: 'git', link: '/git/'},
@@ -54,6 +55,15 @@ module.exports = {
             {title: 'Proxy', path: '/js/es6/Proxy'},
             {title: 'Reflect', path: '/js/es6/Reflect'},
             {title: 'typescript', path: '/js/es6/typescript'},
+          ],
+        },
+      ],
+      '/html/': [
+        {
+          title: 'html',
+          children: [
+            // '/',
+            'html1',
           ],
         },
       ],

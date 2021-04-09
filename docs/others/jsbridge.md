@@ -2,6 +2,9 @@
 
 https://mp.weixin.qq.com/s/cBsmunLXLBEtR14cFfy1LQ
 
+h5 和 原生app 交互原理
+https://mp.weixin.qq.com/s/oMTqMqZHAP3OSeysb1Efcg
+
 #### Url scheme
 
 你可以在浏览器里面直接输入 `weixin://`，系统就会提示你是否要打开微信。输入 `mqq://` 就会帮你唤起手机 QQ。
