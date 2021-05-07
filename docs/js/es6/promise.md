@@ -1,3 +1,7 @@
+https://segmentfault.com/a/1190000039694578
+
+
+
 // new promise 会直接执行 函数
 new Promise(function() {})
 then方法的第一个参数是resolved状态的回调函数，第二个参数是rejected状态的回调函数，它们都是可选的

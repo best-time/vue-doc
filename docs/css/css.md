@@ -231,3 +231,6 @@ scroll-behavior: smooth
 
 ## 快速选择优化
 user-select: all
+
+## css 画形状
+https://segmentfault.com/a/1190000039200998
