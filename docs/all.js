@@ -1878,7 +1878,13 @@ function myInstanceof(left, right) {
        */
     })();
 
-    (function () {})();
+    (function () {
+
+
+
+
+
+    })();
     (function () {})();
     (function () {})();
     (function () {})();

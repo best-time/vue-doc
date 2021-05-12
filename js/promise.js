@@ -270,3 +270,52 @@ const a = () => {
 // 当b()运行的时候，函数a()不会中断，而是继续执行。
 // 等到b()运行结束，可能a()早就运行结束了，b()所在的上下文环境已经消失了。
 // 如果b()或c()报错，错误堆栈将不包括a()。
+
+
+
+
+/*
+const promises = [
+  Promise.reject('ERROR A'),
+  Promise.reject('ERROR B'),
+  Promise.reject('ERROR C'),
+]
+
+Promise.any(promises).then((value) => {
+  console.log('value：', value)
+}).catch((err) => {
+  console.log('err：', err)
+  console.log(err.message)
+  console.log(err.name)
+  console.log(err.errors)
+})
+
+ err：AggregateError: All promises were rejected
+ All promises were rejected
+ AggregateError
+ ["ERROR A", "ERROR B", "ERROR C"]
+*/
+
+// 手写 Promise.any
+let MyPromise = {}
+MyPromise.any = function(promises){
+  return new Promise((resolve,reject)=>{
+    promises = Array.isArray(promises) ? promises : []
+    let len = promises.length
+    // 用于收集所有 reject
+    let errs = []
+    // 如果传入的是一个空数组，那么就直接返回 AggregateError
+    if(len === 0) return reject(new AggregateError('All promises were rejected'))
+    promises.forEach((promise)=>{
+      promise.then(value=>{
+        resolve(value)
+      },err=>{
+        len--
+        errs.push(err)
+        if(len === 0){
+          reject(new AggregateError(errs))
+        }
+      })
+    })
+  })
+}

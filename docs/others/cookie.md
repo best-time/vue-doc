@@ -280,3 +280,55 @@ indexedDBOperation
 .catch(console.log);
 
 ```
+
+
+
+```
+一般来说，安全起见，cookie 都是依靠 set-cookie 头设置，且不允许 JavaScript 设置。
+Set-Cookie: <cookie-name>=<cookie-value>
+Set-Cookie: <cookie-name>=<cookie-value>; Expires=<date>
+Set-Cookie: <cookie-name>=<cookie-value>; Max-Age=<non-zero-digit>
+Set-Cookie: <cookie-name>=<cookie-value>; Domain=<domain-value>
+Set-Cookie: <cookie-name>=<cookie-value>; Path=<path-value>
+Set-Cookie: <cookie-name>=<cookie-value>; Secure
+Set-Cookie: <cookie-name>=<cookie-value>; HttpOnly
+
+Set-Cookie: <cookie-name>=<cookie-value>; SameSite=Strict
+Set-Cookie: <cookie-name>=<cookie-value>; SameSite=Lax
+Set-Cookie: <cookie-name>=<cookie-value>; SameSite=None; Secure
+
+// Multiple attributes are also possible, for example:
+Set-Cookie: <cookie-name>=<cookie-value>; Domain=<domain-value>; Secure; HttpOnly
+
+其中 <cookie-name>=<cookie-value> 这样的 kv 对，内容随你定，另外还有 HttpOnly、SameSite 等配置，一条 Set-Cookie 只配置一项 cookie
+
+
+
+Expires 设置 cookie 的过期时间（时间戳），这个时间是客户端时间。
+Max-Age 设置 cookie 的保留时长（秒数），同时存在 Expires 和 Max-Age 的话，Max-Age 优先
+Domain 设置生效的域名，默认就是当前域名，不包含子域名
+Path 设置生效路径，/ 全匹配
+Secure 设置 cookie 只在 https 下发送，防止中间人攻击
+HttpOnly 设置禁止 JavaScript 访问 cookie，防止XSS
+SameSite 设置跨域时不携带 cookie，防止CSRF
+
+
+Secure 和 HttpOnly 是强烈建议开启的。
+SameSite 选项需要根据实际情况讨论，因为 SameSite 可能会导致即使你用 CORS 解决了跨越问题，
+依然会因为请求没自带 cookie 引起一系列问题，一开始还以为是 axios 配置问题，绕了一大圈，然而根本没关系。
+
+
+
+
+
+OAuth2.0 的流程和重点：
+为你的应用申请 ID 和 Secret
+准备好重定向接口
+正确传参获取 code <- 重要
+code 传入你的重定向接口
+在重定向接口中使用 code 获取 token <- 重要
+传入 token 使用微信接口
+OAuth2.0 着重于第三方登录和权限限制。
+
+
+```

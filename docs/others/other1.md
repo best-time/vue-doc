@@ -88,132 +88,419 @@ diff 算法 — 比较两棵虚拟 DOM 树的差异；
 pach 算法 — 将两个虚拟 DOM 对象的差异应用到真正的 DOM 树。
 
 
-## key的作用
+## 浏览器缓存
+https://mp.weixin.qq.com/s/gV5CA96hsYNPBBn9iRcheg
+好处:
+1.缓解服务器压力，不用每次都去请求某些数据了。
 
-key 是为 Vue 中 vnode 的唯一标记，通过这个 key，我们的 diff 操作可以更准确、更快速。
+2.提升性能，打开本地资源肯定会比请求服务器来的快。
 
-Vue 的 diff 过程可以概括为：oldCh 和 newCh 各有两个头尾的变量 oldStartIndex、oldEndIndex 和 newStartIndex、newEndIndex，它们会新节点和旧节点会进行两两对比，即一共有4种比较方式：newStartIndex 和oldStartIndex 、newEndIndex 和 oldEndIndex 、newStartIndex 和 oldEndIndex 、newEndIndex 和 oldStartIndex，如果以上 4 种比较都没匹配，如果设置了key，就会用 key 再进行比较，在比较的过程中，遍历会往中间靠，一旦 StartIdx > EndIdx 表明 oldCh 和 newCh 至少有一个已经遍历完了，就会结束比较。具体有无 key 的 diff 过程，可以查看作者写的另一篇详解虚拟 DOM 的文章《深入剖析：Vue核心之虚拟DOM》
+3.减少带宽消耗，当我们使用缓存时，只会产生很小的网络消耗，至于为什么打开本地资源也会产生网络消耗，下面会有说明。
 
-所以 Vue 中 key 的作用是：key 是为 Vue 中 vnode 的唯一标记，通过这个 key，我们的 diff 操作可以更准确、更快速
+Web缓存种类：
+1 数据库缓存，
+将查询的数据放在内存中进行缓存, 下次查询此劫在内存中获取,提高响应速度
+2 CDN缓存，
+发送web请求时, cdn会帮我们计算去拿得到这些内容的路径短且快, 这个是网站管理员部署,他们也可以将大家经常访问的内容放在cdn里,加快响应
+3 代理服务器缓存，
+和浏览器缓存性质类似,但它面向群体更广,规模更大,不只为一个用户服务,一般为大量用户提供服务,同一个副本会被重用多次,在减少响应时间和贷款方面很有效
+4 浏览器缓存
+每个浏览器都实现了HTTP缓存,我们通过浏览器使用HTTP协议与服务器交互的时候,浏览器会根据一套与服务器约定的规则进行缓存工作,点击前进后退按钮时
+利用的就是浏览器缓存机制
 
-更准确：因为带 key 就不是就地复用了，在 sameNode 函数 a.key === b.key 对比中可以避免就地复用的情况。所以会更加准确。
+浏览器缓存其实就是指在本地使用的计算机中开辟一个内存区，同时也开辟一个硬盘区作为数据传输的缓冲区，
+然后用这个缓冲区来暂时保存用户以前访问过的信息。
 
-更快速：利用 key 的唯一性生成 map 对象来获取对应节点，比遍历方式更快，源码如下：
+浏览器缓存过程： 强缓存，协商缓存
+浏览器缓存位置一般分为四类： Service Worker--> Memory Cache--> Disk Cache--> Push Cache。
 
-function createKeyToOldIdx (children, beginIdx, endIdx) {
-  let i, key
-  const map = {}
-  for (i = beginIdx; i <= endIdx; ++i) {
-    key = children[i].key
-    if (isDef(key)) map[key] = i
-  }
-  return map
+
+强缓存是当我们访问URL的时候，不会向服务器发送请求，直接从缓存中读取资源，但是会返回200的状态码。
+如何设置强缓存？
+我们第一次进入页面，请求服务器，然后服务器进行应答，浏览器会根据response Header来判断是否对资源进行缓存，
+如果响应头中expires、pragma或者cache-control字段，代表这是强缓存，浏览器就会把资源缓存在memory cache 或 disk cache中。
+
+第二次请求时，浏览器判断请求参数，如果符合强缓存条件就直接返回状态码200，从本地缓存中拿数据。否则把响应参数存在request header请求头中，看是否符合协商缓存，符合则返回状态码304，不符合则服务器会返回全新资源。
+
+expires
+是HTTP1.0控制网页缓存的字段，值为一个时间戳，准确来讲是格林尼治时间，
+服务器返回该请求结果缓存的到期时间，意思是，再次发送请求时，如果未超过过期时间，直接使用该缓存，如果过期了则重新请求。
+
+有个缺点，就是它判断是否过期是用本地时间来判断的，本地时间是可以自己修改的。
+
+Cache-Control
+是HTTP1.1中控制网页缓存的字段，当Cache-Control都存在时，Cache-Control优先级更高，主要取值为：
+
+public：资源客户端和服务器都可以缓存。
+
+privite：资源只有客户端可以缓存。
+
+no-cache：客户端缓存资源，但是是否缓存需要经过协商缓存来验证。
+
+no-store：不使用缓存。
+
+max-age：缓存保质期。
+
+Cache-Control使用了max-age相对时间，解决了expires的问题。
+
+pragma
+这个是HTTP1.0中禁用网页缓存的字段，其取值为no-cache，和Cache-Control的no-cache效果一样。
+
+```
+缓存位置
+强缓存我们会把资源房放到memory cache 和 disk cache中，那什么资源放在memory cache，什么资源放在disk cache中存
+
+存储图像和网页等资源主要缓存在disk cache，操作系统缓存文件等资源大部分都会缓存在memory cache中。
+具体操作浏览器自动分配，看谁的资源利用率不高就分给谁。
+
+可以看到memory cache请求时间都是0ms，这个是不是太神奇了，这方面我来梳理下。
+
+查找浏览器缓存时会按顺序查找: Service Worker-->Memory Cache-->Disk Cache-->Push Cache。
+
+
+1. Service Worker
+是运行在浏览器背后的独立线程，一般可以用来实现缓存功能。
+使用 Service Worker的话，传输协议必须为 HTTPS。
+因为 Service Worker 中涉及到请求拦截，所以必须使用 HTTPS 协议来保障安全。
+Service Worker 的缓存与浏览器其他内建的缓存机制不同，
+它可以让我们自由控制缓存哪些文件、如何匹配缓存、如何读取缓存，并且缓存是持续性的。
+
+2. Memory Cache
+内存中的缓存，主要包含的是当前中页面中已经抓取到的资源，
+例如页面上已经下载的样式、脚本、图片等。读取内存中的数据肯定比磁盘快，内存缓存虽然读取高效，
+可是缓存持续性很短，会随着进程的释放而释放。一旦我们关闭 Tab 页面，内存中的缓存也就被释放了。
+
+3. Disk Cache
+存储在硬盘中的缓存，读取速度慢点，但是什么都能存储到磁盘中，比之 Memory Cache 胜在容量和存储时效性上。
+
+在所有浏览器缓存中，Disk Cache 覆盖面基本是最大的。它会根据 HTTP Herder 中的字段判断哪些资源需要缓存，
+哪些资源可以不请求直接使用，哪些资源已经过期需要重新请求。并且即使在跨站点的情况下，
+相同地址的资源一旦被硬盘缓存下来，就不会再次去请求数据。绝大部分的缓存都来自 Disk Cache。
+
+memory cache 要比 disk cache 快的多。
+举个例子：从远程 web 服务器直接提取访问文件可能需要500毫秒(半秒)，那么磁盘访问可能需要10-20毫秒，
+而内存访问只需要100纳秒，更高级的还有 L1缓存访问(最快和最小的 CPU 缓存)只需要0.5纳秒。
+
+很神奇的，我们又看到了一个prefetch cache，这个又是什么呢?
+
+prefetch cache(预取缓存)
+
+link标签上带了prefetch，再次加载会出现。
+
+prefetch是预加载的一种方式，被标记为prefetch的资源，将会被浏览器在空闲时间加载。
+
+4. Push Cache
+Push Cache（推送缓存）是 HTTP/2 中的内容，当以上三种缓存都没有命中时，它才会被使用。
+它只在会话（Session）中存在，一旦会话结束就被释放，并且缓存时间也很短暂，
+在Chrome浏览器中只有5分钟左右，同时它也并非严格执行HTTP头中的缓存指令。
+
+5. CPU、内存、硬盘
+这里提到了硬盘，内存，可能有些小伙伴对硬盘，内存没什么直观的概念。
+
+CPU、内存、硬盘都是计算机的主要组成部分。
+
+CPU：中央处理单元(CntralPocessingUit)的缩写，也叫处理器，是计算机的运算核心和控制核心。电脑靠CPU来运算、控制。让电脑的各个部件顺利工作，起到协调和控制作用。
+
+硬盘：存储资料和软件等数据的设备，有容量大，断电数据不丢失的特点。
+
+内存：负责硬盘等硬件上的数据与CPU之间数据交换处理。特点是体积小，速度快，有电可存，无电清空，即电脑在开机状态时内存中可存储数据，关机后将自动清空其中的所有数据。
+
+3. 协商缓存
+
+  协商缓存就是强缓存失效后，浏览器携带缓存标识向服务器发送请求，由服务器根据缓存标识来决定是否使用缓存的过程。
+
+  主要有以下两种情况：
+
+  协商缓存生效，返回304
+
+  如何设置协商缓存？
+
+Last-Modified / If-Modified-Since
+
+Last-Modified是服务器响应请求时，返回该资源文件在服务器最后被修改的时间。
+
+If-Modified-Since则是客户端再次发起该请求时，携带上次请求返回的Last-Modified值，通过此字段值告诉服务器该资源上次请求返回的最后被修改时间。服务器收到该请求，发现请求头含有If-Modified-Since字段，则会根据If-Modified-Since的字段值与该资源在服务器的最后被修改时间做对比，若服务器的资源最后被修改时间大于If-Modified-Since的字段值，则重新返回资源，状态码为200；否则则返回304，代表资源无更新，可继续使用缓存文件。
+
+Etag / If-None-Match
+
+Etag是服务器响应请求时，返回当前资源文件的一个唯一标识(由服务器生成)。
+
+If-None-Match是客户端再次发起该请求时，携带上次请求返回的唯一标识Etag值，通过此字段值告诉服务器该资源上次请求返回的唯一标识值。服务器收到该请求后，发现该请求头中含有If-None-Match，则会根据If-None-Match的字段值与该资源在服务器的Etag值做对比，一致则返回304，代表资源无更新，继续使用缓存文件；不一致则重新返回资源文件，状态码为200。
+
+Etag / If-None-Match优先级高于Last-Modified / If-Modified-Since，
+同时存在则只有Etag / If-None-Match生效。
+
+4. 缓存方案
+
+  目前的项目大多使用这种缓存方案的：
+
+  HTML: 协商缓存；
+
+  css、js、图片：强缓存，文件名带上hash。
+
+
+5. 强缓存与协商缓存的区别
+
+  1. 强缓存不发请求到服务器，所以有时候资源更新了浏览器还不知道，但是协商缓存会发请求到服务器，所以资源是否更新，服务器肯定知道。
+
+  2. 大部分web服务器都默认开启协商缓存。
+
+6. 刷新对于强缓存和协商缓存的影响
+
+  1. 当ctrl+f5强制刷新网页时，直接从服务器加载，跳过强缓存和协商缓存。
+
+  2. 当f5刷新网页时，跳过强缓存，但是会检查协商缓存。
+
+  3. 浏览器地址栏中写入URL，回车 浏览器发现缓存中有这个文件了，不用继续请求了，直接去缓存拿。（最快）
+
+```
+
+## 前端监控
+https://mp.weixin.qq.com/s/0uv_Oz6LcSarNYI4i5Be5Q
+
+指标	计算
+重定向耗时	redirectEnd - redirectStart
+DNS解析耗时	domainLookupEnd - domainLookupStart
+TCP连接耗时	connectEnd - connectStart
+SSL连接耗时	connectEnd - secureConnectionStart
+TTFB 网络请求耗时	responseStart - requestStart
+数据传输耗时	responseEnd - responseStart
+资源加载耗时	loadEventStart - domContentLoadedEventEnd
+
+```
+Google工程师一直在推动以用户为中心的性能指标，所以页面展示层面的变化较大，求解方式稍有不同：
+
+FP和FCP
+通过window.performance.getEntriesByType(‘paint’)的方式获取
+
+const paint = window.performance.getEntriesByType('paint');
+const FP = paint[0].startTime,
+const FCP = paint[1].startTime,
+LCP
+function getLCP() {
+    // 增加一个性能条目的观察者
+    new PerformanceObserver((entryList, observer) => {
+        let entries = entryList.getEntries();
+        const lastEntry = entries[entries.length - 1];
+        observer.disconnect();
+        console.log('LCP', lastEntry.renderTime || lastEntry.loadTime);
+    }).observe({entryTypes: ['largest-contentful-paint']});
+}
+FMP
+function getFMP() {
+    let FMP;
+    new PerformanceObserver((entryList, observer) => {
+        let entries = entryList.getEntries();
+        observer.disconnect();
+        console.log('FMP', entries);
+    }).observe({entryTypes: ['element']});
+}
+DCL
+domContentLoadEventEnd – fetchStart
+L
+loadEventStart – fetchStart
+TTI
+domInteractive – fetchStart
+FID
+function getFID() {
+    new PerformanceObserver((entryList, observer) => {
+        let firstInput = entryList.getEntries()[0];
+        if (firstInput) {
+            const FID = firstInput.processingStart - firstInput.startTime;
+            console.log('FID', FID);
+        }
+        observer.disconnect();
+    }).observe({type: 'first-input', buffered: true});
 }
 
+```
+JavaScript运行时有可能会发生错误，
+可归类为七种：语法错误、类型错误、范围错误、引用错误、eval错误、URL错误、资源加载错误。
+为了捕获代码错误，需要考虑两类场景：非Promise场景和Promise场景，因为两种场景捕获错误的策略不同
+
+```
+1.非Promise场景
+
+非Promise场景可通过监听error事件来捕获错误。对于error事件捕获的错误分为两类：资源错误和代码错误。资源错误指的就是js、css、img等未加载，该错误只能在捕获阶段获取到，且为资源错误时event.target.localName存在值（用此区分资源错误与代码错误）；代码错误指的就是语法错误、类型错误等这一类错误，可以获取代码错误的信息、堆栈等，用于排查错误。
+
+export function listenerError() {
+    window.addEventListener('error', (event) => {
+        if (event.target.localName) {
+            console.log('这是资源错误', event);
+        }
+        else {
+            console.log('这是代码错误', event);
+        }
+    }, true)
+}
+2.Promise场景
+
+Promise场景的处理方式有所不同，当Promise被reject且没有reject处理器的时候，会触发unhandlerejection事件，所以通过监听unhandlerejection的事件来捕获错误。
+
+export function listenerPromiseError() {
+    window.addEventListener('unhandledrejection', (event) => {
+        console.log('这是Promise场景中错误', event);
+    })
+}
+```
+二、接口错误
+
+对于浏览器来说，所有的接口均是基于XHR和Fetch实现的，为了捕获接口中的错误，可以通过重写该方法，然后通过接口返回的信息来判断当前接口的状况，下面以XHR为例来展示封装过程。
+
+function newXHR() {
+    const XMLHttpRequest = window.XMLHttpRequest;
+    const oldXHROpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = (method, url, async) => {
+        // 做一些自己的数据上报操作
+        return oldXHROpen.apply(this, arguments);
+    }
+
+    const oldXHRSend = XMLHttpRequest.prototype.send;
+    XMLHttpRequest.prototype.send = (body) => {
+        // 做一些自己的数据上报操作
+        return oldXHRSend.apply(this, arguments);
+    }
+}
+
+上报方式
+
+```
+对于上报的方式无外乎两种：一种是Ajax的方式上报；另一种是通过Image的形式进行上报。目前很多大厂采用的上报方式均是通过一个1*1像素的的gif图片进行上报，既然人家都采用该种策略，那我们就来唠一唠下面两个问题。
+
+为什么采用Image的方式上报?
+
+没有跨域问题。因为数据服务器和后端服务器大概率是不同的域名，若采用Ajax的方式进行处理还要处理跨域问题，否则数据会被浏览器拦截。
+不会阻塞页面加载，只需new Image对象即可。
+图片类型很多，为什么采用gif这种格式进行上报？
+其实归结为一个字——小。对于1*1px的图片，BMP结 构的文件需要74字节，PNG结构的文件需要67字节，GIF结构的文件只需要43字节。同样的响应，GIF可以比BMP节约41%的流量，比PNG节约35%的流量，所以选择gif进行上报。
+```
+
+☆☆☆☆☆ http 相关知识点 ☆☆☆☆☆
+https://juejin.cn/post/6844904070889603085#heading-38
+## HTTP 缓存
+
+HTTP 缓存又分为强缓存和协商缓存：
+
+首先通过 Cache-Control 验证强缓存是否可用，如果强缓存可用，那么直接读取缓存
+如果不可以，那么进入协商缓存阶段，发起 HTTP 请求，服务器通过请求头中是否带上 If-Modified-Since 和 If-None-Match 这些条件请求字段检查资源是否更新：
+若资源更新，那么返回资源和 200 状态码
+如果资源未更新，那么告诉浏览器直接使用缓存获取资源
+
+## HTTP 常用的状态码及使用场景？
+
+1xx：表示目前是协议的中间状态，还需要后续请求
+2xx：表示请求成功
+3xx：表示重定向状态，需要重新请求
+4xx：表示请求报文错误
+5xx：服务器端错误
+常用状态码：
+
+101 切换请求协议，从 HTTP 切换到 WebSocket
+200 请求成功，有响应体
+301 永久重定向：会缓存
+302 临时重定向：不会缓存
+304 协商缓存命中
+403 服务器禁止访问
+404 资源未找到
+400 请求错误
+500 服务器端错误
+503 服务器繁忙
 
 
-## vue 项目进行的优化
-（1）代码层面的优化
+## 302状态码 有哪些场景
+而 302 表示临时重定向，这个资源只是暂时不能被访问了，但是之后过一段时间还是可以继续访问，
+一般是访问某个网站的资源需要权限时，会需要用户去登录，跳转到登录页面之后登录之后，还可以继续访问。
 
-v-if 和 v-show 区分使用场景
+301 类似，都会跳转到一个新的网站，但是 301 代表访问的地址的资源被永久移除了，以后都不应该访问这个地址，搜索引擎抓取的时候也会用新的地址替换这个老的。可以在返回的响应的 location 首部去获取到返回的地址。301 的场景如下：
 
-computed 和 watch 区分使用场景
+比如从 http://baidu.com，跳转到 https://baidu.com
+域名换了
 
-v-for 遍历必须为 item 添加 key，且避免同时使用 v-if
+## HTTP 常用的请求方式，区别和用途？
 
-长列表性能优化
+http/1.1 规定如下请求方法：
 
-事件的销毁
+GET：通用获取数据
+HEAD：获取资源的元信息
+POST：提交数据
+PUT：修改数据
+DELETE：删除数据
+CONNECT：建立连接隧道，用于代理服务器
+OPTIONS：列出可对资源实行的请求方法，常用于跨域
+TRACE：追踪请求-响应的传输路径
 
-图片资源懒加载
+## HTTPS 是什么？具体流程
 
-路由懒加载
+HTTPS 是在 HTTP 和 TCP 之间建立了一个安全层，HTTP 与 TCP 通信的时候，必须先进过一个安全层，对数据包进行加密，然后将加密后的数据包传送给 TCP，相应的 TCP 必须将数据包解密，才能传给上面的 HTTP。
 
-第三方插件的按需引入
-
-优化无限列表性能
-
-服务端渲染 SSR or 预渲染
-
-（2）Webpack 层面的优化
-
-Webpack 对图片进行压缩
-
-减少 ES6 转为 ES5 的冗余代码
-
-提取公共代码
-
-模板预编译
-
-提取组件的 CSS
-
-优化 SourceMap
-
-构建结果输出分析
-
-Vue 项目的编译优化
-
-（3）基础的 Web 技术的优化
-
-开启 gzip 压缩
-
-浏览器缓存
-
-CDN 的使用
-
-使用 Chrome Performance 查找性能瓶颈
+浏览器传输一个 client_random 和加密方法列表，服务器收到后，传给浏览器一个 server_random、加密方法列表和数字证书（包含了公钥），然后浏览器对数字证书进行合法验证，如果验证通过，则生成一个 pre_random，然后用公钥加密传给服务器，服务器用 client_random、server_random 和 pre_random ，使用公钥加密生成 secret，然后之后的传输使用这个 secret 作为秘钥来进行数据的加解密。
 
 
-## vue 3.0的了解
+## 三次握手 和 四次挥手
 
-Vue 3.0 正走在发布的路上，Vue 3.0 的目标是让 Vue 核心变得更小、更快、更强大，因此 Vue 3.0 增加以下这些新特性：
+为什么要进行三次握手：为了确认对方的发送和接收能力。
 
-（1）监测机制的改变
+三次握手
+三次握手主要流程：
 
-3.0 将带来基于代理 Proxy 的 observer 实现，提供全语言覆盖的反应性跟踪。这消除了 Vue 2 当中基于 Object.defineProperty 的实现所存在的很多限制：
+一开始双方处于 CLOSED 状态，然后服务端开始监听某个端口进入 LISTEN 状态
+然后客户端主动发起连接，发送 SYN，然后自己变为 SYN-SENT，seq = x
+服务端收到之后，返回 SYN seq = y 和 ACK ack = x + 1（对于客户端发来的 SYN），自己变成 SYN-REVD
+之后客户端再次发送 ACK seq = x + 1, ack = y + 1给服务端，自己变成 EASTABLISHED 状态，服务端收到 ACK，也进入 ESTABLISHED
 
-只能监测属性，不能监测对象
+SYN 需要对端确认，所以 ACK 的序列化要加一，凡是需要对端确认的，一点要消耗 TCP 报文的序列化
 
-检测属性的添加和删除；
+为什么不是两次？
+无法确认客户端的接收能力。
+如果首先客户端发送了 SYN 报文，但是滞留在网络中，TCP 以为丢包了，然后重传，两次握手建立了连接。
 
-检测数组索引和长度的变更；
+等到客户端关闭连接了。但是之后这个包如果到达了服务端，那么服务端接收到了，然后发送相应的数据表，就建立了链接，但是此时客户端已经关闭连接了，所以带来了链接资源的浪费。
 
-支持 Map、Set、WeakMap 和 WeakSet。
+为什么不是四次？
+四次以上都可以，只不过 三次就够了
 
-新的 observer 还提供了以下特性：
+四次挥手
+一开始都处于 ESTABLISH 状态，然后客户端发送 FIN 报文，带上 seq = p，状态变为 FIN-WAIT-1
+服务端收到之后，发送 ACK 确认，ack = p + 1，然后进入 CLOSE-WAIT 状态
+客户端收到之后进入 FIN-WAIT-2  状态
+过了一会等数据处理完，再次发送 FIN、ACK，seq = q，ack = p + 1，进入 LAST-ACK 阶段
+客户端收到 FIN 之后，客户端收到之后进入 TIME_WAIT（等待 2MSL），然后发送 ACK 给服务端 ack = 1 + 1
+服务端收到之后进入 CLOSED 状态
+客户端这个时候还需要等待两次 MSL 之后，如果没有收到服务端的重发请求，就表明 ACK 成功到达，挥手结束，客户端变为 CLOSED 状态，否则进行 ACK 重发
 
-用于创建 observable 的公开 API。这为中小规模场景提供了简单轻量级的跨组件状态管理解决方案。
+为什么需要等待 2MSL（Maximum Segement Lifetime）：
 
-默认采用惰性观察。在 2.x 中，不管反应式数据有多大，都会在启动时被观察到。如果你的数据集很大，这可能会在应用启动时带来明显的开销。在 3.x 中，只观察用于渲染应用程序最初可见部分的数据。
+因为如果不等待的话，如果服务端还有很多数据包要给客户端发，且此时客户端端口被新应用占据，那么就会接收到无用的数据包，造成数据包混乱，所以说最保险的方法就是等服务器发来的数据包都死翘翘了再启动新应用。
 
-更精确的变更通知。在 2.x 中，通过 Vue.set 强制添加新属性将导致依赖于该对象的 watcher 收到变更通知。在 3.x 中，只有依赖于特定属性的 watcher 才会收到通知。
+1个 MSL 保证四次挥手中主动关闭方最后的 ACK 报文能最终到达对端
+1个 MSL 保证对端没有收到 ACK 那么进行重传的 FIN 报文能够到达
+为什么是四次而不是三次？
 
-不可变的 observable：我们可以创建值的“不可变”版本（即使是嵌套属性），除非系统在内部暂时将其“解禁”。这个机制可用于冻结 prop 传递或 Vuex 状态树以外的变化。
+**如果是三次的话，那么服务端的 ACK 和 FIN 合成一个挥手，那么长时间的延迟可能让 TCP 一位 FIN 没有达到服务器端，然后让客户的不断的重发 FIN
 
-更好的调试功能：我们可以使用新的 renderTracked 和 renderTriggered 钩子精确地跟踪组件在什么时候以及为什么重新渲染。
 
-（2）模板
 
-模板方面没有大的变更，只改了作用域插槽，2.x 的机制导致作用域插槽变了，父组件会重新渲染，而 3.0 把作用域插槽改成了函数的方式，这样只会影响子组件的重新渲染，提升了渲染的性能。
+## 在交互过程中如果数据传送完了，还不想断开连接怎么办，怎么维持？
 
-同时，对于 render 函数的方面，vue3.0 也会进行一系列更改来方便习惯直接使用 api 来生成 vdom 。
+在 HTTP 中响应体的 Connection 字段指定为 keep-alive
 
-（3）对象式的组件声明方式
 
-vue2.x 中的组件是通过声明的方式传入一系列 option，和 TypeScript 的结合需要通过一些装饰器的方式来做，虽然能实现功能，但是比较麻烦。
+## WebSocket与Ajax的区别
 
-3.0 修改了组件的声明方式，改成了类式的写法，这样使得和 TypeScript 的结合变得很容易。
+本质不同
+Ajax 即异步 JavaScript 和 XML，是一种创建交互式网页的应用的网页开发技术
 
-此外，vue 的源码也改用了 TypeScript 来写。其实当代码的功能复杂之后，必须有一个静态类型系统来做一些辅助管理。
+websocket 是 HTML5 的一种新协议，实现了浏览器和服务器的实时通信
 
-现在 vue3.0 也全面改用 TypeScript 来重写了，更是使得对外暴露的 api 更容易结合 TypeScript。静态类型系统对于复杂代码的维护确实很有必要。
+生命周期不同：
 
-（4）其它方面的更改
+websocket 是长连接，会话一直保持
+ajax 发送接收之后就会断开
+适用范围：
 
-vue3.0 的改变是全面的，上面只涉及到主要的 3 个方面，还有一些其他的更改：
+websocket 用于前后端实时交互数据
+ajax 非实时
+发起人：
 
-支持自定义渲染器，从而使得 weex 可以通过自定义渲染器的方式来扩展，而不是直接 fork 源码来改的方式。
-
-支持 Fragment（多个根节点）和 Protal（在 dom 其他部分渲染组建内容）组件，针对一些特殊的场景做了处理。
-
-基于 treeshaking 优化，提供了更多的内置功能。
+AJAX 客户端发起
+WebSocket 服务器端和客户端相互推送
