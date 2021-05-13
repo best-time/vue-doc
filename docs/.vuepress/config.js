@@ -20,7 +20,9 @@ module.exports = {
     sidebarDepth: 2,
     nav: [
       {text: 'js', link: '/js/'},
+      {text: 'html', link: '/html/'},
       {text: 'css', link: '/css/'},
+      {text: 'others', link: '/others/'},
       {text: 'git', link: '/git/'},
       {text: '关于', link: '/about/'},
     ],
@@ -41,15 +43,27 @@ module.exports = {
             'operation',
             'reg',
             'screen',
+            'dom',
+            'dom位置',
+            'function'
           ],
         },
         {
           title: 'es6',
           children: [
             // '/',
-            'Proxy',
-            'Reflect',
+            {title: 'Proxy', path: '/js/es6/Proxy'},
+            {title: 'Reflect', path: '/js/es6/Reflect'},
             {title: 'typescript', path: '/js/es6/typescript'},
+          ],
+        },
+      ],
+      '/html/': [
+        {
+          title: 'html',
+          children: [
+            // '/',
+            'html1',
           ],
         },
       ],
@@ -59,6 +73,16 @@ module.exports = {
           children: [
             // '/',
             'less',
+            'css'
+          ],
+        },
+      ],
+      '/others/': [
+        {
+          title: '其他',
+          children: [
+            // '/',
+            'jsbridge',
           ],
         },
       ],

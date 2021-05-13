@@ -1,23 +1,21 @@
-# typescript
-
-## 下面列举了四种常见的无法正常工作的场景以及对应的解决方法：
+# 下面列举了四种常见的无法正常工作的场景以及对应的解决方法：
 
 ## 库本身没有自带类型定义
 ```
 在初次将 react 改造支持 typescript 时, 想必很多人都会遇到 module.hot 报错.
- 此时只需要安装对应的类型库即可.
+ 此时只需要安装对应的类型库即可. 
 安装 @types/webpack-env
 
 ```
 ## 库本身没有类型定义, 也没有相关的@type
 
 ```
-那只能自己声明一个了. 随便举个栗子.
+那只能自己声明一个了. 随便举个栗子. 
 declare module "lodash"
 ```
 ## 类型声明库有误
 ```
-1. 推动解决官方类型定义的问题, 提issue, pr
+1. 推动解决官方类型定义的问题, 提issue, pr 
 2. Import 后通过 extends 或者 merge 能力对原类型进行扩展
 3. 忍受类型的丢失或不可靠性
 4. 使用 // @ts-ignore  忽略
@@ -33,15 +31,15 @@ declare module "lodash"
 
 ## 类型断言
 ```typescript
-语法如下:
+语法如下: 
 <类型>值
 
-值 as 类型
+值 as 类型 
 // 推荐使用这种语法. 因为<>容易跟泛型, react 中的语法起冲突
 
-举个例子, 如下代码,  padding 值可以是 string , 也可以是 number,
-虽然在代码里面写了 Array(), 我们明确的知道,
-padding 会被parseint 转换成 number 类型, 但类型定义依然会报错.
+举个例子, 如下代码,  padding 值可以是 string , 也可以是 number, 
+虽然在代码里面写了 Array(), 我们明确的知道, 
+padding 会被parseint 转换成 number 类型, 但类型定义依然会报错. 
 
 function padLeft(value: string, padding: string | number) {
    // 报错: Operator '+' cannot be applied to
@@ -49,13 +47,13 @@ function padLeft(value: string, padding: string | number) {
    return Array(padding + 1).join(" ") + value;
 }
 
-解决方法, 使用类型断言. 告诉 typescript 这里我确认它是 number 类型, 忽略报错.
+解决方法, 使用类型断言. 告诉 typescript 这里我确认它是 number 类型, 忽略报错. 
 function padLeft(value: string, padding: string | number) {
    // 正常
    return Array(padding as number + 1).join(" ") + value;
 }
 
-但是如果有下面这种情况, 我们要写很多个 as 么?
+但是如果有下面这种情况, 我们要写很多个 as 么? 
 function padLeft(value: string, padding: string | number) {
    console.log((padding as number) + 3);
    console.log((padding as number) + 2);
@@ -68,7 +66,7 @@ function padLeft(value: string, padding: string | number) {
 ## 类型守卫
 
 类型守卫有以下几种方式, 简单的概括以下
-typeof:  用于判断 "number"，"string"，"boolean"或 "symbol" 四种类型.
+typeof:  用于判断 "number"，"string"，"boolean"或 "symbol" 四种类型. 
 
 instanceof : 用于判断一个实例是否属于某个类
 
@@ -76,7 +74,7 @@ in: 用于判断一个属性/方法是否属于某个对象
 
 字面量类型保护
 
-上面的例子中, 是 string | number 类型, 因此使用 typeof 来进行类型守卫. 例子如下:
+上面的例子中, 是 string | number 类型, 因此使用 typeof 来进行类型守卫. 例子如下: 
 
 ```
 function padLeft(value: string,padding: string | number) {
@@ -134,7 +132,7 @@ function foo(x: A | B) {
 
 ```
 字面量类型保护
-有些场景, 使用 in, instanceof, typeof 太过麻烦. 这时候可以自己构造一个字面量类型.
+有些场景, 使用 in, instanceof, typeof 太过麻烦. 这时候可以自己构造一个字面量类型. 
 type Man = {
    handsome: 'handsome';
    type: 'man';
@@ -158,7 +156,7 @@ function Human(arg: Man | Woman) {
 ```
 
 ## 双重断言
-有些时候使用 as 也会报错,因为 as 断言的时候也不是毫无条件的. 它只有当S类型是T类型的子集，或者T类型是S类型的子集时，S能被成功断言成T.
+有些时候使用 as 也会报错,因为 as 断言的时候也不是毫无条件的. 它只有当S类型是T类型的子集，或者T类型是S类型的子集时，S能被成功断言成T. 
 所以面对这种情况, 只想暴力解决问题的情况, 可以使用双重断言.
 
 ```
@@ -180,12 +178,12 @@ function handler(event: Event) {
 
 # 巧用 typescript 支持的 js 最新特性优化代码
 
-## 1. 可选链 Optional Chining
+## 1. 可选链 Optional Chining 
 ```
 let x = foo?.bar.baz();
 
 
-typescript 中的实现如下:
+typescript 中的实现如下: 
 var _a;
 let x = (_a = foo) === null ||
 _a === void 0 ? void 0 : _a.bar.baz();
@@ -199,7 +197,7 @@ _a === void 0 ? void 0 : _a.bar.baz();
 let x = foo ?? '22';
 
 
-typescript 中的实现如下:
+typescript 中的实现如下: 
 
 let x = (foo !== null && foo !== void 0 ?
 foo : '22');
@@ -222,7 +220,7 @@ RerureType<T> 表示函数类型T的返回值类型
 
 
 类型索引
-为了实现上面的工具函数, 我们需要先了解以下几个语法:
+为了实现上面的工具函数, 我们需要先了解以下几个语法: 
 keyof : 获取类型上的 key 值
 extends : 泛型里面的约束
 T[K] : 获取对象 T 相应 K 的元素类型
@@ -235,7 +233,7 @@ type Partial<T> = {
 
 
 
-Record 作为一个特别灵活的工具. 第一个泛型传入对象的key值, 第二个传入 对象的属性值.
+Record 作为一个特别灵活的工具. 第一个泛型传入对象的key值, 第二个传入 对象的属性值. 
 
 ```
 type Record<K extends string, T> = {
@@ -244,7 +242,7 @@ type Record<K extends string, T> = {
 
 ```
 
-我们看一下下面的这个对象, 你会怎么用 ts 声明它?
+我们看一下下面的这个对象, 你会怎么用 ts 声明它? 
 
 ```
 const AnimalMap = {
@@ -254,7 +252,7 @@ const AnimalMap = {
 };
 ```
 
-此时用 Record 即可.
+此时用 Record 即可. 
 
 ```
 type AnimalType = 'cat' | 'dog' | 'frog';
@@ -289,29 +287,29 @@ interface 同名自动合并,通过extends扩展 只能表达object/class/functi
 shims-tsx.d.ts， 在全局变量 global中批量命名了数个内部模块。
 shims-vue.d.ts，意思是告诉 TypeScript *.vue 后缀的文件可以交给 vue 模块来处理。
 
-declare
+declare 
 var
-
+ 
 声明全局变量
-declare
+declare 
 function
-
+ 
 声明全局方法
-declare
+declare 
 class
-
+ 
 声明全局类
-declare
+declare 
 enum
-
+ 
 声明全局枚举类型
-declare
+declare 
 global
-
+ 
 扩展全局变量
-declare
+declare 
 module
-
+ 
 扩展模块
 ```
 
