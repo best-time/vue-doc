@@ -291,3 +291,12 @@ Object.getPrototypeOf(p)
 5. 只能序列化对象的可枚举的自有属性，例如 如果obj中的对象是有构造函数生成的，
 则使用JSON.parse(JSON.stringify(obj))深拷贝后，会丢弃对象的constructor
 6. 存在循环引用的情况也无法正确实现深拷贝
+
+## 页面通信
+1.
+window.open() + functionName
+window.opener.functionName
+
+2. iframe
+parent.window 通过contentWindow，我们可以拿到iframe内部的方法和dom元素，进而可以操控iframe页面
+parent.window拿到父页面的window
